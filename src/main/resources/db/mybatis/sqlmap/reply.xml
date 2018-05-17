@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reply">
+	
+	<!-- 해당 게시글의 리플목록 가져오기 -->
+	<select id="getAllReply" resultType="ReplyVO" parameterType="Integer">
+		select *
+		from reply
+		where board_seq = #{board_seq}
+		order by comment_seq desc
+	</select>
+
+	<!-- 리플 삭제하기 -->
+	<update id="deleteReply" parameterType="Integer">
+		update reply
+		set del_yn = 'Y'
+		where comment_seq = #{comment_seq}
+	</update>
+	
+	<!-- 리플 등록하기 -->
+	<insert id="insertReply" parameterType="Map">
+		insert into reply
+		values(REPLY_SEQ.nextval, #{board_seq}, #{content}, #{reg_id}, sysdate, 'N')
+	</insert>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+</mapper>

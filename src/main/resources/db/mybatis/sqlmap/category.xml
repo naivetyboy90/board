@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="category">
+
+	<!-- 전체 게시판리스트 가져오기 -->
+	<select id="getCategoryList" resultType="CategoryVO">
+		select *
+		from category
+		order by category_seq
+	</select>
+	
+	<!-- 게시판 1개의 정보 가져오기 -->
+	<select id="getCategory" resultType="CategoryVO" parameterType="Integer">
+		select *
+		from category
+		where category_seq = #{category_seq}
+	</select>
+	
+	<!-- 사용여부 변경 -->
+	<update id="changeUse" parameterType="CategoryVO">
+		update category set
+			use_yn = #{use_yn}
+		where category_seq = #{category_seq}
+	</update>
+	
+	<!-- 게시판 신규등록 -->
+	<insert id="insertCategory" parameterType="CategoryVO">
+		insert into category (category_seq, category_name, reg_id, reg_dt, use_yn)
+		values (category_seq.nextval, #{category_name}, #{reg_id}, sysdate, 'y')
+	</insert>	
+</mapper>

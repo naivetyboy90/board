@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+
+	<!-- 해당 게시판의 모든 게시글 가져오기 -->
+	<select id="getBoardList" resultType="BoardVO" parameterType="map">
+		select * 
+		from
+			(
+			select rownum rn, lpad('≫', 3*(level-1)) || title "title", board_seq, pboard_seq, category_seq, group_seq, content, reg_id, reg_dt, del_yn
+			from board 
+			where category_seq = #{category_seq}
+			start with pboard_seq is null
+			connect by prior board_seq = pboard_seq
+			order siblings by group_seq desc
+			)
+		where rn between (#{page}-1) * #{pageSize} + 1 and #{page} * #{pageSize}
+	</select>
+	
+	<!-- 해당 게시판의 게시글 개수 구하기 -->
+	<select id="getBoardCnt" resultType="Integer" parameterType="Integer">
+		select count(*)
+		from board
+		where category_seq = #{category_seq}
+	</select>
+	
+	<!-- 게시글의 상세정보 가져오기 -->	
+	<select id="getBoardDetail" resultType="BoardVO" parameterType="Integer">
+		select *
+		from board
+		where board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글 삭제하기 -->
+	<update id="deleteBoard" parameterType="Integer">
+		update board
+		set del_yn = 'Y'
+		where board_seq = #{board_seq}
+	</update>
+	
+	<!-- 게시물 수정 -->
+	<update id="modifyBoard" parameterType="BoardVO">
+		update board
+		set title = #{title}, content = #{content}
+		where board_seq = #{board_seq}
+	</update>
+		
+	<!-- 게시물 신규등록 -->
+	<insert id="insertBoard" parameterType="Map">
+	<selectKey keyProperty="board_seq" resultType="int" order="BEFORE">
+		select BOARD_SEQ.nextval from dual
+	</selectKey>
+		insert into board
+		values (#{board_seq}, '', #{category_seq}, #{board_seq}, #{title}, #{content}, #{reg_id}, sysdate, 'N')
+	</insert>
+	
+	<!-- 답글 등록 -->
+	<insert id="replyBoard" parameterType="Map">
+	<selectKey keyProperty="board_seq" resultType="int" order="BEFORE">
+		select BOARD_SEQ.nextval from dual
+	</selectKey>
+		insert into board
+		values (#{board_seq}, #{pboard_seq}, #{category_seq}, #{group_seq}, #{title}, #{content}, #{reg_id}, sysdate, 'N')
+	</insert>
+		
+</mapper>
+
+
+
+
+
+
+
+
+
